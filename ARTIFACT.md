@@ -1,4 +1,4 @@
-# Coyote Artifact
+# COATL Artifact
 ## Contents
 TODO: insert ToC
 ## Introduction
