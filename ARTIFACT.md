@@ -37,10 +37,12 @@ docker run --platform linux/amd64 -it artifact bash
 
 The docker image already builds the heir compiler, but if you want to say recompile it, please use the following commands.
 ```
+source setup.sh
 bazel build @heir//tools:heir-opt
 bazel build @heir//tools:heir-translate
 ```
 
+`TODO: add source command too`
 In addition to the compiler and the runtime, the image also conists of various scripts to automatically run the benchmarks from the paper and generate the associated figures.
 These are:
 * `run-evaluation.sh`: Automatically invokes the build script on the benchmarks listed in the paper. There are several presets available, `small`, `medium`, `large`, `all`, representing the size of the circuits (and correspondingly the expected compile time). Please note that `large` and `all` benchmarks will take a very long time on desktop machines/laptops. Please use servers with high core counts to build it.
