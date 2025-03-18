@@ -85,7 +85,6 @@ Now that this works with the results, you can test run `medium` and `large` benc
 This will generate figures and plots that reproduce the Evaluation (Section 6) in the paper as follows: `runtime-speedup-table1.csv`, `runtime-speedup-fig11.pdf`, `gatecount-table2.csv`, `compiletime-stats-table3.csv`
 
 To view these, either attach to the running Docker container (e.g. using VS Code), or copy the files to your host machine:
-`TODO: update command`
 ```
 docker cp $(docker ps -q):/home/artifact/heir/results .
 ```
