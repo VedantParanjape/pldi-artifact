@@ -221,19 +221,6 @@ This builds two binaries, `square.opt` and `square.unopt`, which we can run!
 
 Both of these should print a result of 25 ($=5^2$), and some timing information. On my machine, `square.opt` runs in about 330 milliseconds, compared to about 460 milliseconds for `square.unopt`.
 
-<!-- ```
-source setup.sh
-mkdir new-example
-(artifact-venv) artifact@3bbcd2ca5c2c:~/heir$ python3 scripts/templates/benchmark.py new_benchmark /home/artifact/heir/new-example test
-Creating dirs:
-  /home/artifact/heir/new-example/test
-Creating dirs:
-  /home/artifact/heir/new-example/test/IR
-Rendered template for /home/artifact/heir/new-example/test/harness.cpp
-Rendered template for /home/artifact/heir/new-example/test/CMakeLists.txt
-Rendered template for /home/artifact/heir/new-example/test/test.mlir
-``` -->
-
 ### Invoking the compiler
 
 The heir compiler can be invoked by using the commands given below:
