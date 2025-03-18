@@ -11,98 +11,60 @@ This includes:
 
 ## Requirements
 ### Software
-* gcc-11, python3, make and cmake
+* We used gcc-13 to compile HEIR, for best results please stick to it!
 ```
-sudo apt install gcc-11 g++-11 python3 make cmake
-```
-* numactl, zip, python3-pip python3-venv
-```
-sudo apt install numactl zip python3-pip python3-venv
-```
-* bazel
-```
-sudo apt install apt-transport-https curl gnupg -y
-curl -fsSL https://bazel.build/bazel-release.pub.gpg | gpg --dearmor >bazel-archive-keyring.gpg
-sudo mv bazel-archive-keyring.gpg /usr/share/keyrings
-echo "deb [arch=amd64 signed-by=/usr/share/keyrings/bazel-archive-keyring.gpg] https://storage.googleapis.com/bazel-apt stable jdk1.8" | sudo tee /etc/apt/sources.list.d/bazel.list
-sudo apt install bazel
+Using built-in specs.
+COLLECT_GCC=gcc
+COLLECT_LTO_WRAPPER=/usr/libexec/gcc/x86_64-linux-gnu/13/lto-wrapper
+OFFLOAD_TARGET_NAMES=nvptx-none:amdgcn-amdhsa
+OFFLOAD_TARGET_DEFAULT=1
+Target: x86_64-linux-gnu
+Configured with: ../src/configure -v --with-pkgversion='Ubuntu 13.3.0-6ubuntu2~24.04' --with-bugurl=file:///usr/share/doc/gcc-13/README.Bugs --enable-languages=c,ada,c++,go,d,fortran,objc,obj-c++,m2 --prefix=/usr --with-gcc-major-version-only --program-suffix=-13 --program-prefix=x86_64-linux-gnu- --enable-shared --enable-linker-build-id --libexecdir=/usr/libexec --without-included-gettext --enable-threads=posix --libdir=/usr/lib --enable-nls --enable-bootstrap --enable-clocale=gnu --enable-libstdcxx-debug --enable-libstdcxx-time=yes --with-default-libstdcxx-abi=new --enable-libstdcxx-backtrace --enable-gnu-unique-object --disable-vtable-verify --enable-plugin --enable-default-pie --with-system-zlib --enable-libphobos-checking=release --with-target-system-zlib=auto --enable-objc-gc=auto --enable-multiarch --disable-werror --enable-cet --with-arch-32=i686 --with-abi=m64 --with-multilib-list=m32,m64,mx32 --enable-multilib --with-tune=generic --enable-offload-targets=nvptx-none=/build/gcc-13-fG75Ri/gcc-13-13.3.0/debian/tmp-nvptx/usr,amdgcn-amdhsa=/build/gcc-13-fG75Ri/gcc-13-13.3.0/debian/tmp-gcn/usr --enable-offload-defaulted --without-cuda-driver --enable-checking=release --build=x86_64-linux-gnu --host=x86_64-linux-gnu --target=x86_64-linux-gnu --with-build-config=bootstrap-lto-lean --enable-link-serialization=2
+Thread model: posix
+Supported LTO compression algorithms: zlib zstd
+gcc version 13.3.0 (Ubuntu 13.3.0-6ubuntu2~24.04)
 ```
 ### Hardware
-amd64 ubuntu server with a good amount of threads (> 64) to build the heir compiler and run the benchmarks.
+amd64 ubuntu server with a good amount of threads (> 64) to build the heir compiler and run the benchmarks. Please not that the larger benchmarks will take indefinitely on smaller machines like say MacBook Pro or any laptop!
 
 ## Using the Artifact
-<!-- The provided Dockerfile automatically builds and installs all dependencies of Coyote.
-To build and run the Docker image, run the following commands from the directory containing the Dockerfile: -->
-<!-- ```
-docker build -t coyote .
-docker run -it coyote bash
-``` -->
-We have to first build the heir compiler to use it to run the benchmarks. Please follow the steps given below in the artifact directory.
+The provided Dockerfile automatically builds and installs all dependencies of Coyote.
+To build and run the Docker image, run the following commands from the directory containing the Dockerfile:
 ```
-unzip heir.zip
-unzip benchmarks.zip
-cp -r zipped/ heir-sync-main/benchmarks
-cd heir-sync-main
+docker buildx build --platform linux/amd64 -t artifact .
+docker run --platform linux/amd64 -it artifact bash
+```
+
+The docker image already builds the heir compiler, but if you want to say recompile it, please use the following commands.
+```
 bazel build @heir//tools:heir-opt
+bazel build @heir//tools:heir-translate
 ```
+
 In addition to the compiler and the runtime, the image also conists of various scripts to automatically run the benchmarks from the paper and generate the associated figures.
 These are:
-* `compile_benchmarks.py`: Automatically invokes the build script on a set of circuits defined in `benchmarks.py`. There are several presets available, `small`, `medium`, and `large`, representing the size of the circuits (and correspondingly the expected compile time).
-* `polynomial_benchmarks.py`: Generates and compiles the random tree benchmarks used in Section 6.5 of the paper. 
-* `build_and_run_all.py`: Builds binaries from all generated C++ code, invokes them one at a time, and organizes the resulting CSV files.
-* `figures.py`: Reads the CSV files and generates the figures from the paper.
+* `run-evaluation.sh`: Automatically invokes the build script on the benchmarks listed in the paper. There are several presets available, `small`, `medium`, `large`, `all`, representing the size of the circuits (and correspondingly the expected compile time). Please note that `large` and `all` benchmarks will take a very long time on desktop machines/laptops. Please use servers with high core counts to build it.
 
-Note that there are two experiments omitted from the artifact, as they require some manual effort to set up and run. 
-These are `mm.16.blocked` from Section 6.4 of the paper, and the Schedule Cost over Time graph from Section 6.8 of the paper.
+`TODO: add info about scripts for plotting and creating fancy tables`
 
 ### Demo
-Lets start by building all the `small` benchmarks (all replication sorts for `conv.4.2`, `mm.2`, `dot.3`, `dot.6`, and `dot.10`, as well as the ungrouped `sort[3]`):
-```
-python3 compile_benchmarks.py --preset small
-```
-(This took about 10 minutes on my machine)
-
-Lets also build some of the polynomial trees; in particular, we'll build three of the depth 5 trees in each of the three regimes:
-```
-python3 polynomial_benchmarks.py -d 5 -r "100-100" "100-50" "50-50" -i 2
-```
-(This took about 10 minutes on my machine).
-
-We can see, for example, some of the Coyote vector IR:
-```
-cat sort_3/vec
-```
-and the corresponding generated vector C++ code:
-```
-cat bfv_backend/coyote_out/sort_3/vector.cpp
-```
-
-We can also build the data layout case study from Section 6.7 of the paper, although note that these circuits are considerably larger, so compiling them will take some time:
+Lets start by building all the `small` benchmarks (pir, mul8, add8 and psi8)
 
 ```
-python3 compile_benchmarks.py --preset layout
+bash run-evaluation.sh small
 ```
+This took about 30 mins to complete fully and generate the data. The run logs are dumped in the root folder as run-evaluation.log and the results in form of csv are dumped in benchmarks-small folder.
 
-Now, we need to compile all the C++ code and collect data.
-Although we used 50 runs and 50 iterations in the paper, lets only use 10 of each to make this go faster:
-```
-python3 build_and_run_all.py --runs 10 --iters 10
-```
-You should see some CMake output followed by the encryption and run times for both scalar and vector versions of each circuit.
-Note that this script will not re-run benchmarks that already have corresponding CSV files in `bfv_backend/csvs/`.
-
-Once this is finished running, we can look at one of the generated CSV files:
-```
-cat bfv_backend/csvs/sort/sort_3.csv
-```
+Now that this works with the results, you can test run `medium` and `large` benchmarks similarly. Please use a server with good multicore perf as these benchmarks take a very long time on desktop grade machines. After this is done, please run the `all` preset to run all the benchmarks described in the paper and generate the data for them.
 
 Now that we've collected all the data for these benchmarks, we can generate the graphs:
 ```
-python3 figures.py
+python3 plot.py
 ```
 
 This will generate three plots:
-`graphs/vector_speedups.png`, `case_study.png`, and `trees.png`.
+`TODO: write about the path of the graphs`
+
 To view these, either attach to the running Docker container (e.g. using VS Code), or copy the files to your host machine:
 ```
 docker cp $(docker ps -q):/home/artifact/graphs/ .
@@ -110,50 +72,16 @@ docker cp $(docker ps -q):/home/artifact/graphs/ .
 
 ## Usage
 ### Writing a Coyote program
-Coyote is a DSL embedded in Python, so Coyote programs are just Python functions.
-To tag a function as a circuit for Coyote to compile, first get an instance of the Coyote compiler:
-```
-from coyote import *
-coyote = coyote_compiler()
-```
-Next, use the compiler to annotate your function with input types:
-```
-@coyote.define_circuit(A=matrix(3, 3), B=matrix(3, 3))
-def matrix_multiply(A, B):
-    ...
-```
-For a full discussion of the available types and their compile-time semantics, see the paper.
-
-Finally, use the build script `coyote_compile.py` to invoke the Coyote compiler on the Python file in which this code is saved:
-```
-python3 coyote_compile.py benchmarks.py -c matrix_multiply
-```
+`TODO`
 
 ### Invoking the compiler
-The Coyote compiler can be invoked from the command line via `coyote_compile.py`.
-The example invocation above does the following:
-1. It parses `benchmarks.py` and loads a list of all circuits defined in that file
-2. It uses Coyote to compile/vectorize the spcified `matrix_multiply` circuit
-3. It creates a directory called `matrix_multiply` and saves intermediate scalar and vector code into that directory
-4. It lowers the intermediate code into C++ and then creates a directory in `bfv_backend/coyote_cout/matrix_multiply/` and saves the generated C++ there.
-
-The script expects the name of a Python file that defines one or more circuits (as described above), and then takes a number of command-line parameters:
-* `-l`, `--list`: Lists all the circuits defined in the file and exit, does not actually compile anything
-* `-c`, `--circuits`: Load the specified circuits from the file and compile them into C++
-* `-o`, ``-output-dir`: Specify the directory into which to place the generated intermediate code (defaults to the directory from which `coyote_compile.py` is invoked)
-* `--backend-dir`: Specify the directory containing the test harness backend (defaults to `bfv_backend/`)
-* `--no-cpp`: Stops after generated the intermediate code and doesn't generate C++
-* `--just-cpp`: Uses pregenerated intermediate code to generate C++ instead of recompiling the circuit; this fails if it can't find the intermediate code under `[output-dir]/[circuit-name]/`
-
-### Running the test harness
-The backend test harness comes with a CMake file that automatically builds binaries for everything under `coyote_out`.
-The generated binaries perform a number of `runs`, where each run consists of executing the scalar and vectorized circuits on random encrypted inputs for a number of `iterations` and then outputting the total time each version (scalar and vector) took to encrypt, as well as run.
-All these outputs are then saved into a csv file with the same name as the circuit (e.g. running the binary generated from the example above would create a file called `matrix_multiply.csv`).
-
-The number of runs and iterations default to 50 each (as these are the values used in the paper), but are configurable via cmake.
-An example invocation that uses 10 runs with 10 iterations each is as follows:
+The heir compiler can be invoked by using the commands given below:
 ```
-cd bfv_backend && mkdir build && cd build && cmake .. -DRUNS=10 -DITERATIONS=10 && make
+bazel run //tools:heir-opt -- --unroll-secret-loops '--yosys-optimizer=mode=LUT' --shrink-lut-constants --merge-luts --secret-distribute-generic --canonicalize --comb-to-cggi --cggi-canonicalize-luts --cse --cggi-to-openfhe <.mlir file path>
 ```
 
-
+The options are described as follows:
+1. `--unroll-secret-loops` since FHE can't work with loops, we need to unroll all loops completely. The loops wrapped in secret block are unrolled by this option.
+2. `--yosys-optimizer=mode=LUT` set the yoysys optimizer mode to use LUTs.
+3. `--shrink-lut-constants`, `--secret-distribute-generic`, `--canonicalize`, `--comb-to-cggi`, `--cggi-canonicalize-luts`, `--cse`, `--cggi-to-openfhe` generic options to canonicalize and optimize the generated code and then convert CGGI backend circuits to openFHE backend.
+4. `--merge-luts` invokes the optimization implemented in the paper to merge LUTs.

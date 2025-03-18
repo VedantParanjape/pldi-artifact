@@ -57,6 +57,12 @@ RUN git init
 # COPY run-evaluation.sh .
 COPY setup.sh .
 
-COPY benchmarks.zip .
-RUN unzip benchmarks.zip
-RUN mv zipped benchmarks
+COPY benchmarks-all.zip .
+COPY benchmarks-small.zip .
+COPY benchmarks-medium.zip .
+COPY benchmarks-large.zip .
+
+RUN unzip benchmarks-small.zip
+RUN mv zipped benchmarks-small
+# USER root
+# RUN apt-get -y install gdb
