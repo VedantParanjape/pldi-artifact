@@ -19,21 +19,21 @@ for line in file.readlines():
     elif "MergeLUTs" in line:
         benchmark_tags.append(line.strip())
 
-for i in benchmark_tags:
-    print(i)
+# for i in benchmark_tags:
+#     print(i)
 
 mlir_compile_time = []
 
 for i in range(0, len(benchmark_tags), 4):
-    print(i)
     if "unopt" in benchmark_tags[i]:
         mlir_compile_time.append([benchmark_tags[i].split(" ")[1].split("...")[0], int(benchmark_tags[i].split("(")[1].split(" ")[0]), 0.0])
     
     if "opt" in benchmark_tags[i+1] and "codegen...done" in benchmark_tags[i+3]:
         mlir_compile_time.append([benchmark_tags[i+1].split(" ")[1].split("...")[0], int(benchmark_tags[i+3].split("(")[1].split(" ")[0]), float(benchmark_tags[i+2].split(" ")[0])])
 
-for i in mlir_compile_time:
-    print(i)
+# print("mlir compile time")
+# for i in mlir_compile_time:
+#     print(i)
 
 benchmark_tags_part_2 = []
 part2 = False
@@ -44,9 +44,10 @@ for line in file.readlines():
 
     if part2 and "opt:runtime" in line:
         benchmark_tags_part_2.append(line.strip())
-    
-for i in benchmark_tags_part_2:
-    print(i)
+
+# print("bmk tags")
+# for i in benchmark_tags_part_2:
+#     print(i)
 
 fhe_compile_time = []
 
@@ -54,13 +55,15 @@ for i in benchmark_tags_part_2:
     temp = i.split(":")
     fhe_compile_time.append([temp[0]+"."+temp[1], float(temp[3])])
 
-for i in fhe_compile_time:
-    print(i)
+# print("fhe compile time")
+# for i in fhe_compile_time:
+#     print(i)
 
 final_result = []
 for i in range(0, len(fhe_compile_time), 2):
     # if fhe_compile_time
     cols = []
+    # print(f"debug: {mlir_compile_time[i]}")
     cols.append(mlir_compile_time[i][0].split(".")[0])
     cols.append(mlir_compile_time[i][1])
     cols.append(fhe_compile_time[i][1])
