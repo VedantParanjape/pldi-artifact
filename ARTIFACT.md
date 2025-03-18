@@ -100,7 +100,7 @@ This took about 30 mins to complete fully and generate the data. The run logs ar
 
 Now that this works with the results, you can test run `medium` and `large` benchmarks similarly. Please use a server with good multicore perf as these benchmarks take a very long time on desktop grade machines. After this is done, please run the `all` preset to run all the benchmarks described in the paper and generate the data for them.
 
-This will generate figures and plots that reproduce the Evaluation (Section 6) in the paper as follows: `runtime-speedup-table1.csv`, `runtime-speedup-fig11.pdf`, `gatecount-table2.csv`, `compiletime-stats-table3.csv`
+This script will generate figures and plots that reproduce the Evaluation (Section 6) in the paper as follows: `runtime-speedup-table1.csv`, `runtime-speedup-fig11.pdf`, `gatecount-table2.csv`, `compiletime-stats-table3.csv`
 
 To view these, either attach to the running Docker container (e.g. using VS Code), or copy the files to your host machine:
 
@@ -239,7 +239,9 @@ Rendered template for /home/artifact/heir/new-example/test/test.mlir
 The heir compiler can be invoked by using the commands given below:
 
 ```
-bazel run //tools:heir-opt -- --unroll-secret-loops '--yosys-optimizer=mode=LUT' --shrink-lut-constants --merge-luts --secret-distribute-generic --canonicalize --comb-to-cggi --cggi-canonicalize-luts --cse --cggi-to-openfhe <.mlir file path>
+bazel run //tools:heir-opt -- --unroll-secret-loops '--yosys-optimizer=mode=LUT' --shrink-lut-constants --merge-luts --secret-distribute-generic --canonicalize --comb-to-cggi --cggi-canonicalize-luts --cse --cggi-to-openfhe <absolute .mlir file path>
+bazel run @heir//tools:heir-translate -- --emit-openfhe-bin <absolute .mlir file path
+bazel run @heir//tools:heir-translate -- --emit-openfhe-bin-header <absolute .mlir file path>
 ```
 
 The options are described as follows:
@@ -248,3 +250,10 @@ The options are described as follows:
 2. `--yosys-optimizer=mode=LUT` set the yoysys optimizer mode to use LUTs.
 3. `--shrink-lut-constants`, `--secret-distribute-generic`, `--canonicalize`, `--comb-to-cggi`, `--cggi-canonicalize-luts`, `--cse`, `--cggi-to-openfhe` generic options to canonicalize and optimize the generated code and then convert CGGI backend circuits to openFHE backend.
 4. `--merge-luts` invokes the optimization implemented in the paper to merge LUTs.
+5. `--emit-openfhe-bin` lowers the mlir code to openFHE backend C++ code.
+6. `--emit-openfhe-bin-header` generates headers for the openFHE C++ code generated.
+
+> Please note: all paths provided to bazel have to be absolute paths, or else it will not work. Also heir-opt heir-translate dumps the output file to stdout, so we need to pipe it out to a file and save it.
+
+#### Manually compile the example program
+`TODO`
