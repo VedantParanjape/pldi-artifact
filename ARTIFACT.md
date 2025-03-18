@@ -243,4 +243,28 @@ The options are described as follows:
 > Please note: all paths provided to bazel have to be absolute paths, or else it will not work. Also heir-opt heir-translate dumps the output file to stdout, so we need to pipe it out to a file and save it.
 
 #### Manually compile the example program
-`TODO`
+Please first follow the instructions in [writing a coatl program](#writing-a-coatl-program), and once that works, it will be easier to run these instructions.
+
+Let us first run COATL optimization on MLIR code.
+```
+bazel run //tools:heir-opt -- --unroll-secret-loops '--yosys-optimizer=mode=LUT' --shrink-lut-constants --merge-luts --secret-distribute-generic --canonicalize --comb-to-cggi --cggi-canonicalize-luts --cse --cggi-to-openfhe /home/artifact/example-benchmark/square/square.mlir > /home/artifact/example-benchmark/square/IR/square.opt.mlir
+```
+
+Now that we have run our optimization, we will translate the MLIR to openFHE C++ backend code.
+```
+bazel run @heir//tools:heir-translate -- --emit-openfhe-bin /home/artifact/example-benchmark/square/IR/square.opt.mlir > /home/artifact/example-benchmark/square/square.opt.cpp
+```
+
+Now that we have run our optimization, generate C++ headers for openFHE C++ backend code.
+```
+bazel run @heir//tools:heir-translate -- --emit-openfhe-bin-header /home/artifact/example-benchmark/square/IR/square.opt.mlir > /home/artifact/example-benchmark/square/square.opt.hpp
+```
+
+Lets build and run this!
+
+```
+cd ~/example-benchmark/square
+mkdir build && cd build
+cmake .. -G "Unix Makefiles"
+make -j4
+```
