@@ -72,3 +72,4 @@ RUN mv zipped benchmarks-large
 
 RUN unzip benchmarks-all.zip
 RUN mv zipped benchmarks-all
+RUN mkdir results
