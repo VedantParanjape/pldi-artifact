@@ -87,13 +87,25 @@ This will generate figures and plots that reproduce the Evaluation (Section 6) i
 To view these, either attach to the running Docker container (e.g. using VS Code), or copy the files to your host machine:
 `TODO: update command`
 ```
-docker cp $(docker ps -q):/home/artifact/results/ .
+docker cp $(docker ps -q):/home/artifact/heir/results .
 ```
 
 ## Usage
 ### Writing a COATL program
 `TODO`
 
+```
+source setup.sh
+mkdir new-example
+(artifact-venv) artifact@3bbcd2ca5c2c:~/heir$ python3 scripts/templates/benchmark.py new_benchmark /home/artifact/heir/new-example test
+Creating dirs:
+  /home/artifact/heir/new-example/test
+Creating dirs:
+  /home/artifact/heir/new-example/test/IR
+Rendered template for /home/artifact/heir/new-example/test/harness.cpp
+Rendered template for /home/artifact/heir/new-example/test/CMakeLists.txt
+Rendered template for /home/artifact/heir/new-example/test/test.mlir
+```
 ### Invoking the compiler
 The heir compiler can be invoked by using the commands given below:
 ```
