@@ -28,7 +28,7 @@ gcc version 13.3.0 (Ubuntu 13.3.0-6ubuntu2~24.04)
 amd64 ubuntu server with a good amount of threads (> 64) to build the heir compiler and run the benchmarks. Please not that the larger benchmarks will take indefinitely on smaller machines like say MacBook Pro or any laptop!
 
 ## Using the Artifact
-The provided Dockerfile automatically builds and installs all dependencies of Coyote.
+The provided Dockerfile automatically builds and installs all dependencies of COATL.
 To build and run the Docker image, run the following commands from the directory containing the Dockerfile:
 ```
 docker buildx build --platform linux/amd64 -t artifact .
