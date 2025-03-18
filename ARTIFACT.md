@@ -144,12 +144,12 @@ We see a CMake and a harness, an empty directory to store the eventually generat
 ```
 module {
   func.func @square(%arg: !secret.secret<i8>) -> !secret.secret<i8> {
-    return %arg : !secret.secret<i8>
+    func.return %arg : !secret.secret<i8>
   }
 }
 ```
 
-Lets replace the body of the function with our benchmark's implementation:
+Lets replace the `func.return` instruction with our benchmark's implementation:
 
 ```
 %result = secret.generic ins(%arg: !secret.secret<i8>) {
