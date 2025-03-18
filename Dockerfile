@@ -64,5 +64,14 @@ COPY benchmarks-large.zip .
 
 RUN unzip benchmarks-small.zip
 RUN mv zipped benchmarks-small
+
+RUN unzip benchmarks-medium.zip
+RUN mv zipped benchmarks-medium
+
+RUN unzip benchmarks-large.zip
+RUN mv zipped benchmarks-large
+
+RUN unzip benchmarks-all.zip
+RUN mv zipped benchmarks-all
 # USER root
 # RUN apt-get -y install gdb

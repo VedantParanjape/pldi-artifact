@@ -47,6 +47,11 @@ These are:
 
 `TODO: add info about scripts for plotting and creating fancy tables`
 
+The benchmarks are divided into three levels based on the circuit complexity:
+1. `small` has pir, mul8, add8 and psi8.
+2. `medium` has mul16, add16 and add32.
+3. `large` has mul32 and psi16.
+
 ### Demo
 Lets start by building all the `small` benchmarks (pir, mul8, add8 and psi8)
 
