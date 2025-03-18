@@ -1,6 +1,10 @@
 # COATL Artifact
 ## Contents
-TODO: insert ToC
+1) [Introduction](#introduction)
+2) [Requirements](#requirements)
+3) [Using the artifact](#using-the-artifact)
+4) [Usage](#usage)
+
 ## Introduction
 This Docker image contains everything necessary to replicate the results of the paper **Circuit Optimization Using Arithmetic Table Lookups**.
 This includes:
@@ -34,6 +38,18 @@ To build and run the Docker image, run the following commands from the directory
 docker buildx build --platform linux/amd64 -t artifact .
 docker run --platform linux/amd64 -it artifact bash
 ```
+Once the docker image has been built, you are able to run bash in it, run these following commands inside the docker container.
+
+```
+source setup.sh
+bash run-evaluation.sh small
+```
+
+This will generate figures and tables used in the paper in the `result/` folder. The files are as follows:
+1. `runtime-speedup-table1.csv`: This csv file has results generated for Table 1 in Section 6.1 in the paper. It has speedup data of benchmarks that were run.
+2. `runtime-speedup-fig11.pdf`: This pdf file has a figure of speedup plot for the benchmarks run. This reproduces the Figure 11 in Section 6.1 in the paper.
+3. `gatecount-table2.csv`: This csv file has results for the gatecount of the optimized vs unoptimized circuits. This reproduces Table 2 in Section 6.1.
+4. `compiletime-stats-table3.csv`: This csv file has results for the compiletime statistics for COATL. This reproduces Table 3 in Section 6.2.
 
 The docker image already builds the heir compiler, but if you want to say recompile it, please use the following commands.
 ```
@@ -42,12 +58,13 @@ bazel build @heir//tools:heir-opt
 bazel build @heir//tools:heir-translate
 ```
 
-`TODO: add source command too`
 In addition to the compiler and the runtime, the image also conists of various scripts to automatically run the benchmarks from the paper and generate the associated figures.
 These are:
-* `run-evaluation.sh`: Automatically invokes the build script on the benchmarks listed in the paper. There are several presets available, `small`, `medium`, `large`, `all`, representing the size of the circuits (and correspondingly the expected compile time). Please note that `large` and `all` benchmarks will take a very long time on desktop machines/laptops. Please use servers with high core counts to build it.
-
-`TODO: add info about scripts for plotting and creating fancy tables`
+* `run-evaluation.sh <option>`: Automatically invokes the build script on the benchmarks listed in the paper. There are several presets available, `small`, `medium`, `large`, `all`, representing the size of the circuits (and correspondingly the expected compile time). Please note that `large` and `all` benchmarks will take a very long time on desktop machines/laptops. Please use servers with high core counts to build it.
+* `setup.sh`: This should be sourced (`source setup.sh`) before running any other scripts. This will source python virtual environment.
+* `plot-speedup.py <path>`: This python script will create figure for speedup in `results/` folder. Provide the path to an input .csv file.
+* `table-speedup.py <path>`: This python script will create tables as .csv for speedup in `results/` folder. Provide the path to the .csv file.
+* `table-compiletime.py <path>`: This python script will create table as .csv for compiletime statistics in `results/` folder. Provide the path to the .csv file.
 
 The benchmarks are divided into three levels based on the circuit complexity:
 1. `small` has pir, mul8, add8 and psi8.
@@ -58,23 +75,19 @@ The benchmarks are divided into three levels based on the circuit complexity:
 Lets start by building all the `small` benchmarks (pir, mul8, add8 and psi8)
 
 ```
+source setup.sh
 bash run-evaluation.sh small
 ```
 This took about 30 mins to complete fully and generate the data. The run logs are dumped in the root folder as run-evaluation.log and the results in form of csv are dumped in benchmarks-small folder.
 
 Now that this works with the results, you can test run `medium` and `large` benchmarks similarly. Please use a server with good multicore perf as these benchmarks take a very long time on desktop grade machines. After this is done, please run the `all` preset to run all the benchmarks described in the paper and generate the data for them.
 
-Now that we've collected all the data for these benchmarks, we can generate the graphs:
-```
-python3 plot.py
-```
-
-This will generate three plots:
-`TODO: write about the path of the graphs`
+This will generate figures and plots that reproduce the Evaluation (Section 6) in the paper as follows: `runtime-speedup-table1.csv`, `runtime-speedup-fig11.pdf`, `gatecount-table2.csv`, `compiletime-stats-table3.csv`
 
 To view these, either attach to the running Docker container (e.g. using VS Code), or copy the files to your host machine:
+`TODO: update command`
 ```
-docker cp $(docker ps -q):/home/artifact/graphs/ .
+docker cp $(docker ps -q):/home/artifact/results/ .
 ```
 
 ## Usage

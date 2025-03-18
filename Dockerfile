@@ -1,12 +1,10 @@
 FROM ubuntu
 WORKDIR /home/artifact
 
-# install dependencies first
 RUN apt-get update && apt-get -y install git make cmake clang-18 gcc-13
 RUN apt-get -y install vim zip wget adduser
 RUN apt-get -y install build-essential
 
-# Update the package list, install sudo, create a non-root user, and grant password-less sudo permissions
 RUN addgroup --gid 1001 artifact && \
     adduser --uid 1002 --gid 1001 --disabled-password --gecos "" artifact && \
     echo 'artifact ALL=(ALL) NOPASSWD: ALL' >> /etc/sudoers
@@ -50,11 +48,12 @@ USER artifact
 RUN python3 -m venv artifact-venv
 RUN artifact-venv/bin/pip3 install --upgrade setuptools
 RUN artifact-venv/bin/pip3 install -r requirements-dev.txt
+RUN artifact-venv/bin/pip3 install matplotlib
 RUN git init
 
-# COPY evaluate-compiletime.sh .
-# COPY generate-gate-info.sh .
-# COPY run-evaluation.sh .
+COPY plot-speedup.py .
+COPY table-speedup.py .
+COPY table-compiletime.py .
 COPY setup.sh .
 
 COPY benchmarks-all.zip .
@@ -73,5 +72,3 @@ RUN mv zipped benchmarks-large
 
 RUN unzip benchmarks-all.zip
 RUN mv zipped benchmarks-all
-# USER root
-# RUN apt-get -y install gdb
