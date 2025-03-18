@@ -76,7 +76,7 @@ docker cp $(docker ps -q):/home/artifact/graphs/ .
 ```
 
 ## Usage
-### Writing a Coyote program
+### Writing a COATL program
 `TODO`
 
 ### Invoking the compiler
