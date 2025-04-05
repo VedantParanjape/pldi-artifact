@@ -61,7 +61,7 @@ This will generate figures and tables used in the paper in the `result/` folder.
 
 1. `runtime-speedup-table1.csv`: This csv file has results generated for Table 1 in Section 6.1 in the paper. It has speedup data of benchmarks that were run.
 2. `runtime-speedup-fig11.pdf`: This pdf file has a figure of speedup plot for the benchmarks run. This reproduces the Figure 11 in Section 6.1 in the paper.
-3. `gatecount-table2.csv`: This csv file has results for the gatecount of the optimized vs unoptimized circuits. This reproduces Table 2 in Section 6.1. **Please note that the gate counts might vary by 1 or 2 from the paper due to the solver being non-deterministic.**
+3. `gatecount-table2.csv`: This csv file has results for the gatecount of the optimized vs unoptimized circuits. This reproduces Table 2 in Section 6.1. **Please note that the gate counts might vary by 1-2% from the numbers reported in the paper due to the solver being non-deterministic.**
 4. `compiletime-stats-table3.csv`: This csv file has results for the compiletime statistics for COATL. This reproduces Table 3 in Section 6.2.
 
 The docker image already builds the heir compiler, but if you want to say recompile it, please use the following commands.
@@ -86,6 +86,7 @@ The benchmarks are divided into three levels based on the circuit complexity:
 1. `small` has pir, mul8, add8 and psi8.
 2. `medium` has mul16, add16 and add32.
 3. `large` has mul32 and psi16.
+4. `all` has all the benchmarks in `small` + `medium` + `large`.
 
 ### Demo
 
